@@ -9,7 +9,7 @@ import {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export function getModel(modelName = 'gemini-2.5-flash') {
+export function getModel(modelName = 'gemini-3.1-flash-lite-preview') {
   return genAI.getGenerativeModel({ model: modelName });
 }
 
@@ -64,7 +64,10 @@ export async function chatWithNutritionist(messages, userContext = {}) {
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }],
     }));
-    const chat = model.startChat({ history, systemInstruction: systemPrompt });
+    const chat = model.startChat({ 
+      history, 
+      systemInstruction: { parts: [{ text: systemPrompt }] } 
+    });
     const lastMessage = messages[messages.length - 1];
     const result = await chat.sendMessage(lastMessage.content);
     return result.response.text();

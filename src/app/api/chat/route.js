@@ -74,6 +74,7 @@ export async function POST(request) {
       reply,
     });
   } catch (error) {
+    console.error('[API Chat Error]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
