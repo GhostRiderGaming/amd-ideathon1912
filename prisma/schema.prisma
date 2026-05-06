@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String         @id @default(cuid())
+  name                String
+  age                 Int?
+  weightKg            Float?
+  heightCm            Float?
+  activityLevel       String         @default("moderate")
+  goal                String         @default("maintain")
+  dietaryRestrictions String         @default("[]")
+  allergies           String         @default("[]")
+  dailyCalorieTarget  Int            @default(2000)
+  dailyProteinTarget  Int            @default(50)
+  dailyCarbTarget     Int            @default(250)
+  dailyFatTarget      Int            @default(65)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  meals               Meal[]
+  conversations       Conversation[]
+}
+
+model Meal {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  mealType      String     @default("snack")
+  imageData     String?
+  calories      Float      @default(0)
+  protein       Float      @default(0)
+  carbs         Float      @default(0)
+  fat           Float      @default(0)
+  fiber         Float      @default(0)
+  healthScore   Float      @default(0)
+  aiAnalysis    String?
+  aiSuggestions String?
+  loggedAt      DateTime   @default(now())
+  createdAt     DateTime   @default(now())
+  items         FoodItem[]
+}
+
+model FoodItem {
+  id       String @id @default(cuid())
+  mealId   String
+  meal     Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  name     String
+  quantity String?
+  calories Float  @default(0)
+  protein  Float  @default(0)
+  carbs    Float  @default(0)
+  fat      Float  @default(0)
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
+}
